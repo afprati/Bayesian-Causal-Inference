@@ -64,6 +64,14 @@ To run this project, users need to have python, pytorch and gpytorch installed l
 
 ### Prerequisites
 
+1. Check that have a CUDA compatible Graphics Card
+2. Install Anaconda (with Python >=3.6)
+3. Install Visual Studio (make sure you install the C++ redistributable)
+4. Install CUDA SDK (>=9.2) [https://developer.nvidia.com/cuda-toolkit-ARCHIVE]
+5. Install PyTorch (Specify system specs) [https://pytorch.org/get-started/locally/]
+6. Install Pyro (pip install pyro-ppl)
+7. Ensure all variables in data are the same type
+
 
 ### Installation
 
