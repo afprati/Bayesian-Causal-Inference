@@ -10,7 +10,9 @@ import os
 
 smoke_test = ('CI' in os.environ)
 training_iterations = 2 if smoke_test else 500
+import timeit
 
+start = timeit.default_timer()
 
 def train(train_x, train_i, train_y, model, likelihood, optimizer):
     # Find optimal model hyperparameters
@@ -80,6 +82,9 @@ def main():
     savejson(model, likelihood, json_file)
 
     visualize_multitask(X_tr, X_co, Y_tr, Y_co, ATT, model, likelihood, T0)
+
+    stop = timeit.default_timer()
+    print('Time: ', stop - start)
 
 
 if __name__ == "__main__":
