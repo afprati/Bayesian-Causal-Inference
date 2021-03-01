@@ -42,12 +42,14 @@ def generate_synthetic_data(N_tr, N_co, T, T0, d, Delta, noise_std, seed):
     for i in range(N_tr):
         for t in range(T):
             for k in range(d):
-                X_tr[i, t, k] += 1 + a[t,k] + b_tr[i,k] + a[t,k]*b_tr[i,k]
+                # no need to add error terms?
+                X_tr[i, t, k] += 1 + a[t,k]*b_tr[i,k] + a[t,k] + b_tr[i,k]
 
     for i in range(N_co):
         for t in range(T):
             for k in range(d):
-                X_co[i, t, k] += 1 + a[t,k] + b_co[i,k] + a[t,k]*b_co[i,k]
+                # again, no need to add error terms?
+                X_co[i, t, k] += 1 + a[t,k]*b_co[i,k] + a[t,k] + b_co[i,k]
 
     # here assume y_it = delta*D + sum((2d+1)*x_itd) + alpha_t + beta + e
     # alpha_tr = [sin(t) + 2*t]

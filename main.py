@@ -5,36 +5,54 @@ from model.multitaskmodel import MultitaskGPModel
 from utilities.savejson import savejson
 from utilities.visualize import visualize_multitask
 from utilities.synthetic import generate_synthetic_data
-from model.fixedeffect import TwoWayFixedEffectModel
+#from model.fixedeffect import TwoWayFixedEffectModel
 import os
 
-smoke_test = ('CI' in os.environ)
-training_iterations = 2 if smoke_test else 500
 import timeit
 
 start = timeit.default_timer()
+# this is for running the notebook in the gpytorch testing framework
+smoke_test = ('CI' in os.environ)
+training_iterations = 2 if smoke_test else 100
 
+# creating a function to train the model
 def train(train_x, train_i, train_y, model, likelihood, optimizer):
+    #train_x = train_x.cuda()
+    #train_y = train_y.cuda()
+    #train_i = train_i.cuda()
+    #likelihood = likelihood.cuda()
+    #model = model.cuda()
+
     # Find optimal model hyperparameters
     model.train()
     likelihood.train()
+    # per main currently uses the Adam optimizer
 
     # "Loss" for GPs - the marginal log likelihood
     mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
 
     for i in range(training_iterations):
+        # Zero gradients from previous iteration
         optimizer.zero_grad()
+        # Output from model
         output = model(train_x, train_i)
+        # Calc loss and backprop gradients
         loss = -mll(output, train_y)
         loss.backward()
         print('Iter %d/%d - Loss: %.3f' % (i + 1, training_iterations, loss.item()))
         optimizer.step()
+
+    #model = model.cpu()
+    #likelihood = likelihood.cpu()
 
     return model, likelihood
 
 
 def main():
     # load configurations
+    # specifically defines
+    # N_tr=5, N_co=45, T=30, T0=20, d=5, noise_std=1, treatment_effect=1, and seed=0
+    # will be used to make synthetic data
     with open('model/conf.json') as f:
         data = json.load(f)
 
@@ -47,6 +65,7 @@ def main():
     Delta = data["treatment_effect"]
     seed = data["seed"]
 
+    # making the synthetic data, defined in "synthetic.py"
     X_tr, X_co, Y_tr, Y_co, ATT = generate_synthetic_data(N_tr, N_co, T, T0, d, Delta, noise_std, seed)
 
     # fit = TwoWayFixedEffectModel(X_tr, X_co, Y_tr, Y_co, ATT, T0)
